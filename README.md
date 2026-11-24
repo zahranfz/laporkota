@@ -349,9 +349,9 @@ Aplikasi LaporKota dikembangkan oleh tim mahasiswa:
 
 | No | Nama Lengkap | NIM | Peran Utama (*Role*) |
 |:--:|--------------|:---:|----------------------|
-| 1 | [Nama Anggota 1] | [NIM Anggota 1] | **Project Lead & Fullstack Developer** |
-| 2 | [Nama Anggota 2] | [NIM Anggota 2] | **Frontend Developer & UI/UX Specialist** |
-| 3 | [Nama Anggota 3] | [NIM Anggota 3] | **Backend Developer & Database Architect** |
+| 1 | [Zahran Febrian Nugraha] | [H1D025074] | **Project Lead & Fullstack Developer** |
+| 2 | [Heksa Aji Permana] | [H1D025098] | **Frontend Developer & UI/UX Specialist** |
+| 3 | [Reza Kurniawan] | [H1D025099] | **Backend Developer & Database Architect** |
 
 ---
 
