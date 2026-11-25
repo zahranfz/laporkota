@@ -547,7 +547,26 @@ include __DIR__ . '/../includes/header.php';
         font-weight: 600;
         padding: 5px 14px;
         border-radius: 50px;
-        color: #FFFFFF;
+    }
+    .badge-status-detail.badge-diterima {
+        background-color: var(--status-diterima-bg, #EFF6FF);
+        color: var(--status-diterima, #2563EB);
+        border: 1px solid var(--status-diterima-border, #BFDBFE);
+    }
+    .badge-status-detail.badge-diproses {
+        background-color: var(--status-diproses-bg, #FFFBEB);
+        color: var(--accent-dark, #B45309);
+        border: 1px solid var(--status-diproses-border, #FDE68A);
+    }
+    .badge-status-detail.badge-selesai {
+        background-color: var(--status-selesai-bg, #F0FDF4);
+        color: var(--status-selesai, #16A34A);
+        border: 1px solid var(--status-selesai-border, #BBF7D0);
+    }
+    .badge-status-detail.badge-ditolak {
+        background-color: var(--status-ditolak-bg, #FEF2F2);
+        color: var(--status-ditolak, #DC2626);
+        border: 1px solid var(--status-ditolak-border, #FECACA);
     }
 
     /* ── Responsive ────────────────────────────── */
