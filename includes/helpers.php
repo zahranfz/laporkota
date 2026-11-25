@@ -80,6 +80,19 @@ function uploadFile($file, $targetDir = null) {
     if ($targetDir === null) {
         $targetDir = __DIR__ . '/../uploads/';
     }
+    $targetDir = rtrim($targetDir, '/') . '/';
+
+    // Pastikan direktori tujuan tersedia dan memiliki izin tulis
+    if (!is_dir($targetDir)) {
+        if (!@mkdir($targetDir, 0777, true) && !is_dir($targetDir)) {
+            return ['error' => 'Direktori penyimpanan file tidak tersedia atau gagal dibuat.'];
+        }
+        @chmod($targetDir, 0777);
+    }
+
+    if (!is_writable($targetDir)) {
+        return ['error' => 'Direktori penyimpanan file tidak memiliki izin penulisan (writable).'];
+    }
 
     $allowedMime = ['image/jpeg', 'image/png', 'image/webp'];
     $allowedExt  = ['jpg', 'jpeg', 'png', 'webp'];
@@ -112,8 +125,8 @@ function uploadFile($file, $targetDir = null) {
     $newName = bin2hex(random_bytes(16)) . '.' . $ext;
     $targetPath = $targetDir . $newName;
 
-    if (!move_uploaded_file($file['tmp_name'], $targetPath)) {
-        return ['error' => 'Gagal menyimpan file.'];
+    if (!@move_uploaded_file($file['tmp_name'], $targetPath)) {
+        return ['error' => 'Gagal menyimpan file. Pastikan izin folder uploads sudah benar.'];
     }
 
     return ['filename' => $newName];

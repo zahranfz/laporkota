@@ -730,8 +730,8 @@ $mapLng = isset($old['longitude']) && is_numeric($old['longitude']) ? (float) $o
                         <div class="dropzone-text">
                             Seret & lepas foto di sini, atau <strong>klik untuk memilih</strong>
                         </div>
-                        <div class="dropzone-hint">Format: JPG, PNG, JPEG. Maksimal 2MB.</div>
-                        <input type="file" name="photo" id="photo-input" accept="image/jpeg,image/png,image/jpg">
+                        <div class="dropzone-hint">Format: JPG, PNG, WebP. Maksimal 2MB.</div>
+                        <input type="file" name="photo" id="photo-input" accept="image/jpeg,image/png,image/webp,image/jpg">
                     </div>
                     <div id="photo-preview"></div>
                     <?php if (isset($errors['photo'])): ?>

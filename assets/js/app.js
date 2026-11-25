@@ -248,6 +248,27 @@
 
     // Drag and drop events if dropzone exists
     if (dropzone) {
+      // Trigger native file dialog on dropzone click (if not a <label>)
+      if (dropzone.tagName.toLowerCase() !== 'label') {
+        dropzone.addEventListener('click', function (e) {
+          if (e.target !== input) {
+            input.click();
+          }
+        });
+      }
+
+      // Keyboard accessibility
+      if (!dropzone.hasAttribute('tabindex')) {
+        dropzone.setAttribute('tabindex', '0');
+      }
+      dropzone.setAttribute('role', 'button');
+      dropzone.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          input.click();
+        }
+      });
+
       ['dragenter', 'dragover'].forEach((eventName) => {
         dropzone.addEventListener(eventName, function (e) {
           e.preventDefault();
