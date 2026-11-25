@@ -340,14 +340,17 @@ include __DIR__ . '/../includes/header.php';
         content: '';
         position: absolute;
         left: 9px;
-        top: 8px;
-        bottom: 8px;
+        top: 12px;
+        bottom: 12px;
         width: 2px;
         background: var(--border, #E2E8F0);
     }
     .timeline-item {
         position: relative;
-        padding-bottom: 24px;
+        padding: 12px 0;
+    }
+    .timeline-item:first-child {
+        padding-top: 0;
     }
     .timeline-item:last-child {
         padding-bottom: 0;
@@ -391,7 +394,7 @@ include __DIR__ . '/../includes/header.php';
     .comment-item {
         display: flex;
         gap: 12px;
-        padding: 14px 0;
+        padding: 14px 24px;
     }
     .comment-item + .comment-item {
         border-top: 1px solid var(--border-light, #F1F5F9);
