@@ -391,6 +391,8 @@ include __DIR__ . '/../includes/header.php';
     }
     .comment-item + .comment-item {
         border-top: 1px solid var(--border-light, #F1F5F9);
+        margin-top: 12px;
+        padding-top: 26px;
     }
     .comment-avatar {
         width: 40px;
