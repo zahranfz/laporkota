@@ -16,6 +16,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - ak-network
 
   db:
     image: mariadb:10.11
@@ -36,6 +38,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - ak-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -49,6 +53,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - ak-network
 
 volumes:
   db_data:
+
+networks:
+  ak-network:
+    driver: bridge
