@@ -347,13 +347,6 @@ include __DIR__ . '/../includes/header.php';
     }
     .timeline-item {
         position: relative;
-        padding: 12px 0;
-    }
-    .timeline-item:first-child {
-        padding-top: 0;
-    }
-    .timeline-item:last-child {
-        padding-bottom: 0;
     }
     .timeline-dot {
         position: absolute;
@@ -371,7 +364,7 @@ include __DIR__ . '/../includes/header.php';
     .timeline-dot.dot-selesai   { background: #16A34A; box-shadow: 0 0 0 2px #16A34A33; }
     .timeline-dot.dot-ditolak   { background: #DC2626; box-shadow: 0 0 0 2px #DC262633; }
     .timeline-content {
-        padding-top: 0;
+        padding-top: 12px;
     }
     .timeline-status {
         font-weight: 600;
