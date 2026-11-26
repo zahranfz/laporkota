@@ -1684,7 +1684,10 @@ textarea.form-control {
    ========================================================================== */
 
 .map-container {
+  display: block;
+  position: relative;
   width: 100%;
+  min-height: 380px;
   height: 380px;
   border-radius: var(--radius-card);
   border: 1px solid var(--border);
@@ -1694,7 +1697,7 @@ textarea.form-control {
 }
 
 .map-container-sm { height: 260px; }
-.map-container-lg { height: 480px; }
+.map-container-lg { height: 480px; min-height: 380px; }
 
 .leaflet-popup-content-wrapper {
   border-radius: var(--radius-card) !important;

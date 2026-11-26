@@ -284,7 +284,7 @@ include __DIR__ . '/../includes/sidebar.php';
                     </span>
                 </div>
             </div>
-            <div id="map"></div>
+            <div id="map" class="map-container map-container-lg" role="region" aria-label="Peta sebaran pengaduan masyarakat"></div>
         </div>
     </div>
 </div>
@@ -374,12 +374,6 @@ include __DIR__ . '/../includes/sidebar.php';
         </main>
     </div>
 </div>
-
-<!-- JavaScript Dependencies -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-<script src="<?= base_url('assets/js/app.js') ?>"></script>
 
 <!-- Page Specific Inline Scripts -->
 <script>
@@ -531,30 +525,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ── 4. Leaflet Map Initialization ───────────────────────
-    // Purwokerto coordinates: -7.4240, 109.2330
-    const map = L.map('map').setView([-7.4240, 109.2330], 13);
+    const mapElement = document.getElementById('map');
+    if (mapElement && typeof L !== 'undefined') {
+        // Default view: Purwokerto. The map container must have a non-zero height.
+        const defaultCenter = [-7.4240, 109.2330];
+        const map = L.map(mapElement, { scrollWheelZoom: true }).setView(defaultCenter, 13);
 
-    // OpenStreetMap tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 18
-    }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(map);
 
-    // Complaint Markers Data
-    const markers = <?= json_encode($mapMarkers, JSON_UNESCAPED_UNICODE) ?>;
-    const statusColors = {
-        'Diterima': '#2563EB',
-        'Diproses': '#F59E0B',
-        'Selesai': '#16A34A',
-        'Ditolak': '#DC2626'
-    };
+        // Complaint markers are JSON-encoded with HTML-sensitive characters escaped.
+        const markers = <?= json_encode($mapMarkers, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) ?: '[]' ?>;
+        const statusColors = {
+            'Diterima': '#2563EB',
+            'Diproses': '#F59E0B',
+            'Selesai': '#16A34A',
+            'Ditolak': '#DC2626'
+        };
 
-    if (markers.length > 0) {
-        const bounds = [];
+        const escapeMapHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+        }[char]));
+
+        const markerBounds = [];
         markers.forEach(function(item) {
-            const color = statusColors[item.status] || '#0F766E';
+            const lat = Number(item.lat);
+            const lng = Number(item.lng);
+            if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                return;
+            }
 
-            const marker = L.circleMarker([item.lat, item.lng], {
+            const color = statusColors[item.status] || '#0F766E';
+            const marker = L.circleMarker([lat, lng], {
                 radius: 8,
                 fillColor: color,
                 color: '#FFFFFF',
@@ -563,21 +567,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 fillOpacity: 0.9
             }).addTo(map);
 
-            bounds.push([item.lat, item.lng]);
+            markerBounds.push([lat, lng]);
 
-            // Popup content
             const popupHtml = `
                 <div style="min-width: 200px; font-family: 'Inter', sans-serif;">
-                    <div style="font-size: 11px; font-weight: 700; color: #0F766E;">${item.ticket_code}</div>
-                    <div style="font-size: 13px; font-weight: 600; margin: 4px 0; color: #1E293B;">${item.title}</div>
+                    <div style="font-size: 11px; font-weight: 700; color: #0F766E;">${escapeMapHtml(item.ticket_code)}</div>
+                    <div style="font-size: 13px; font-weight: 600; margin: 4px 0; color: #1E293B;">${escapeMapHtml(item.title)}</div>
                     <div style="margin-bottom: 6px;">
-                        <span class="badge-status ${item.badge_class}" style="font-size: 11px; padding: 2px 8px;">${item.status}</span>
+                        <span class="badge-status ${escapeMapHtml(item.badge_class)}" style="font-size: 11px; padding: 2px 8px;">${escapeMapHtml(item.status)}</span>
                     </div>
                     <div style="font-size: 11px; color: #64748B; margin-bottom: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 12px; vertical-align: -1px;">location_on</span>
-                        ${item.address}
+                        ${escapeMapHtml(item.address)}
                     </div>
-                    <a href="${item.detail_url}" class="btn btn-sm btn-teal text-white w-100 text-center text-decoration-none" style="font-size: 11px; padding: 4px 8px;" target="_blank">
+                    <a href="${escapeMapHtml(item.detail_url)}" class="btn btn-sm btn-teal text-white w-100 text-center text-decoration-none" style="font-size: 11px; padding: 4px 8px;" target="_blank" rel="noopener noreferrer">
                         Lihat Detail
                     </a>
                 </div>
@@ -585,9 +588,19 @@ document.addEventListener('DOMContentLoaded', function() {
             marker.bindPopup(popupHtml);
         });
 
-        if (bounds.length > 1) {
-            map.fitBounds(bounds, { padding: [30, 30] });
+        if (markerBounds.length === 1) {
+            map.setView(markerBounds[0], 16);
+        } else if (markerBounds.length > 1) {
+            map.fitBounds(markerBounds, { padding: [30, 30], maxZoom: 16 });
         }
+
+        // Recalculate map dimensions after the dashboard layout has finished rendering.
+        const refreshMapSize = () => map.invalidateSize({ pan: false });
+        requestAnimationFrame(refreshMapSize);
+        window.addEventListener('load', refreshMapSize, { once: true });
+        setTimeout(refreshMapSize, 300);
+    } else if (mapElement) {
+        mapElement.innerHTML = '<div class="p-3 text-center text-muted">Peta tidak dapat dimuat. Periksa koneksi internet dan pemuatan pustaka peta.</div>';
     }
 });
 </script>
