@@ -266,6 +266,65 @@ $pageTitle = 'LaporKota - Layanan Aspirasi & Pengaduan Warga Purwokerto';
             background-color: var(--primary-light);
         }
 
+        /* Homepage navigation: desktop row, mobile collapsible panel */
+        .navbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        .navbar-mobile-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-input);
+            background: #FFFFFF;
+            color: var(--primary-teal);
+        }
+
+        .navbar-mobile-toggle .material-symbols-outlined {
+            font-size: 25px;
+        }
+
+        .navbar-collapse-custom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 1 1 auto;
+            min-width: 0;
+            gap: 12px;
+            margin-left: 12px;
+        }
+
+        .navbar-links-custom {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .navbar-auth-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 0 0 auto;
+            gap: 8px;
+        }
+
+        .navbar-auth-actions > a,
+        .navbar-auth-actions .dropdown > button {
+            white-space: nowrap;
+        }
+
         /* Hero Section */
         .hero-section {
             padding: 80px 0 60px;
@@ -865,6 +924,106 @@ $pageTitle = 'LaporKota - Layanan Aspirasi & Pengaduan Warga Purwokerto';
             .hero-section {
                 padding: 50px 0 40px;
             }
+
+            .navbar-custom {
+                padding: 10px 0;
+            }
+
+            .navbar-inner {
+                width: 100%;
+            }
+
+            .navbar-mobile-toggle {
+                display: inline-flex;
+            }
+
+            .navbar-collapse-custom {
+                display: none;
+                width: 100%;
+                margin: 0;
+                padding-top: 12px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .navbar-collapse-custom.show {
+                display: flex;
+            }
+
+            .navbar-links-custom {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 2px;
+            }
+
+            .navbar-links-custom .nav-link-custom {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                padding: 10px 12px;
+            }
+
+            .navbar-auth-actions {
+                width: 100%;
+                justify-content: stretch;
+                gap: 10px;
+            }
+
+            .navbar-auth-actions > a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex: 1 1 0;
+                min-width: 0;
+                padding: 9px 12px;
+            }
+
+            .navbar-auth-actions .dropdown {
+                width: 100%;
+            }
+
+            .navbar-auth-actions .dropdown > button {
+                width: 100%;
+                justify-content: center;
+                min-width: 0;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .navbar-custom .container-custom {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .navbar-inner {
+                flex: 0 0 auto;
+            }
+
+            .navbar-collapse-custom {
+                display: flex !important;
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .container-custom {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .brand-name {
+                font-size: 1.2rem;
+            }
+
+            .navbar-auth-actions > a {
+                gap: 5px;
+                padding-left: 8px;
+                padding-right: 8px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -872,55 +1031,71 @@ $pageTitle = 'LaporKota - Layanan Aspirasi & Pengaduan Warga Purwokerto';
 
 <!-- Navbar -->
 <nav class="navbar-custom">
-    <div class="container-custom d-flex justify-content-between align-items-center">
-        <!-- Logo -->
-        <a href="<?= base_url('index.php') ?>" class="brand-logo">
-            <div class="brand-icon">
-                <span class="material-symbols-outlined" style="font-size: 24px;">campaign</span>
-            </div>
-            <div class="brand-name">Lapor<span>Kota</span></div>
-        </a>
+    <div class="container-custom">
+        <div class="navbar-inner">
+            <!-- Logo -->
+            <a href="<?= base_url('index.php') ?>" class="brand-logo">
+                <div class="brand-icon">
+                    <span class="material-symbols-outlined" style="font-size: 24px;">campaign</span>
+                </div>
+                <div class="brand-name">Lapor<span>Kota</span></div>
+            </a>
 
-        <!-- Desktop Navigation Links -->
-        <div class="d-none d-lg-flex align-items-center gap-2">
-            <a href="<?= base_url('index.php') ?>" class="nav-link-custom">Beranda</a>
-            <a href="#cara-kerja" class="nav-link-custom">Cara Kerja</a>
-            <a href="#kategori" class="nav-link-custom">Kategori</a>
-            <a href="#pengaduan-terbaru" class="nav-link-custom">Pengaduan Terbaru</a>
-            <a href="#sdg11" class="nav-link-custom">SDG 11</a>
+            <!-- Mobile Navigation Toggle -->
+            <button
+                class="navbar-mobile-toggle"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#homeNavbar"
+                aria-controls="homeNavbar"
+                aria-expanded="false"
+                aria-label="Buka atau tutup menu navigasi"
+            >
+                <span class="material-symbols-outlined">menu</span>
+            </button>
         </div>
 
-        <!-- Auth Actions -->
-        <div class="d-flex align-items-center gap-2">
-            <?php if ($currentUser): ?>
-                <div class="dropdown">
-                    <button class="btn btn-outline-teal d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="material-symbols-outlined">account_circle</span>
-                        <span><?= e($currentUser['name']) ?></span>
-                        <span class="badge bg-secondary" style="font-size: 0.7rem;"><?= e($currentUser['role']) ?></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: var(--radius-input);">
-                        <?php if ($currentUser['role'] === 'admin'): ?>
-                            <li><a class="dropdown-item py-2" href="<?= base_url('admin/dashboard.php') ?>"><span class="material-symbols-outlined align-middle me-2">dashboard</span>Dashboard Admin</a></li>
-                        <?php else: ?>
-                            <li><a class="dropdown-item py-2" href="<?= base_url('user/profile.php') ?>"><span class="material-symbols-outlined align-middle me-2">account_circle</span>Profil Saya</a></li>
-                            <li><a class="dropdown-item py-2" href="<?= base_url('user/history.php') ?>"><span class="material-symbols-outlined align-middle me-2">history</span>Riwayat Saya</a></li>
-                            <li><a class="dropdown-item py-2" href="<?= base_url('user/complaint_create.php') ?>"><span class="material-symbols-outlined align-middle me-2">add_circle</span>Buat Laporan</a></li>
-                        <?php endif; ?>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item py-2 text-danger" href="<?= base_url('auth/logout.php') ?>"><span class="material-symbols-outlined align-middle me-2">logout</span>Keluar</a></li>
-                    </ul>
-                </div>
-            <?php else: ?>
-                <a href="<?= base_url('auth/login.php') ?>" class="btn btn-outline-teal">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">login</span>
-                    <span>Masuk</span>
-                </a>
-                <a href="<?= base_url('auth/register.php') ?>" class="btn btn-teal">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
-                    <span>Daftar</span>
-                </a>
-            <?php endif; ?>
+        <!-- Navigation Links & Auth Actions -->
+        <div class="collapse navbar-collapse-custom" id="homeNavbar">
+            <div class="navbar-links-custom">
+                <a href="<?= base_url('index.php') ?>" class="nav-link-custom">Beranda</a>
+                <a href="#cara-kerja" class="nav-link-custom">Cara Kerja</a>
+                <a href="#kategori" class="nav-link-custom">Kategori</a>
+                <a href="#pengaduan-terbaru" class="nav-link-custom">Pengaduan Terbaru</a>
+                <a href="#sdg11" class="nav-link-custom">SDG 11</a>
+            </div>
+
+            <div class="navbar-auth-actions">
+                <?php if ($currentUser): ?>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-teal d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="material-symbols-outlined">account_circle</span>
+                            <span><?= e($currentUser['name']) ?></span>
+                            <span class="badge bg-secondary" style="font-size: 0.7rem;"><?= e($currentUser['role']) ?></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: var(--radius-input);">
+                            <?php if ($currentUser['role'] === 'admin'): ?>
+                                <li><a class="dropdown-item py-2" href="<?= base_url('admin/dashboard.php') ?>"><span class="material-symbols-outlined align-middle me-2">dashboard</span>Dashboard Admin</a></li>
+                            <?php else: ?>
+                                <li><a class="dropdown-item py-2" href="<?= base_url('user/profile.php') ?>"><span class="material-symbols-outlined align-middle me-2">account_circle</span>Profil Saya</a></li>
+                                <li><a class="dropdown-item py-2" href="<?= base_url('user/history.php') ?>"><span class="material-symbols-outlined align-middle me-2">history</span>Riwayat Saya</a></li>
+                                <li><a class="dropdown-item py-2" href="<?= base_url('user/complaint_create.php') ?>"><span class="material-symbols-outlined align-middle me-2">add_circle</span>Buat Laporan</a></li>
+                            <?php endif; ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="<?= base_url('auth/logout.php') ?>"><span class="material-symbols-outlined align-middle me-2">logout</span>Keluar</a></li>
+                        </ul>
+                    </div>
+                <?php else: ?>
+                    <a href="<?= base_url('auth/login.php') ?>" class="btn btn-outline-teal">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">login</span>
+                        <span>Masuk</span>
+                    </a>
+                    <a href="<?= base_url('auth/register.php') ?>" class="btn btn-teal">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
+                        <span>Daftar</span>
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </nav>
