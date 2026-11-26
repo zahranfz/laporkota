@@ -63,14 +63,17 @@ function redirect($url) {
 function generateTicketCode($conn) {
     $year = date('Y');
     $stmt = $conn->prepare(
-        "SELECT COUNT(*) AS cnt FROM complaints WHERE ticket_code LIKE ?"
+        "SELECT COALESCE(MAX(CAST(SUBSTRING_INDEX(ticket_code, '-', -1) AS UNSIGNED)), 0) AS max_no
+         FROM complaints
+         WHERE ticket_code LIKE ? AND ticket_code REGEXP ?"
     );
     $pattern = "LK-{$year}-%";
-    $stmt->bind_param("s", $pattern);
+    $codeFormat = "^LK-{$year}-[0-9]+$";
+    $stmt->bind_param("ss", $pattern, $codeFormat);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
     $stmt->close();
-    $next = ($row['cnt'] ?? 0) + 1;
+    $next = ((int) ($row['max_no'] ?? 0)) + 1;
     return sprintf("LK-%s-%04d", $year, $next);
 }
 

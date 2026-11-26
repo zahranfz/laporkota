@@ -146,26 +146,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         } else {
             // Create new complaint
-            $ticketCode = generateTicketCode($conn);
             $status = 'Diterima';
+            $ticketCode = null;
+            $newId = 0;
+            $lockAcquired = false;
+            $submissionSucceeded = false;
 
-            $stmt = $conn->prepare("INSERT INTO complaints (user_id, category_id, ticket_code, title, description, address, latitude, longitude, photo, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("iissssddssss", $user['id'], $category_id, $ticketCode, $title, $description, $address, $latVal, $lngVal, $photoPath, $status, $now, $now);
-            $stmt->execute();
-            $newId = $stmt->insert_id;
-            $stmt->close();
+            try {
+                // Serializes ticket-code allocation across concurrent requests.
+                $lockResult = $conn->query("SELECT GET_LOCK('laporkota_ticket_code', 10) AS acquired");
+                $lockRow = $lockResult ? $lockResult->fetch_assoc() : null;
+                $lockAcquired = (int) ($lockRow['acquired'] ?? 0) === 1;
 
-            // Insert status log
-            $logStmt = $conn->prepare("INSERT INTO complaint_status_logs (complaint_id, old_status, new_status, changed_by, note, created_at) VALUES (?, NULL, ?, ?, ?, ?)");
-            $changedBy = 'Sistem';
-            $logNote = 'Laporan diterima oleh sistem.';
-            $logStmt->bind_param("issss", $newId, $status, $changedBy, $logNote, $now);
-            $logStmt->execute();
-            $logStmt->close();
+                if (!$lockAcquired) {
+                    throw new RuntimeException('Lock kode tiket tidak berhasil diperoleh.');
+                }
 
-            flash('success', 'Pengaduan berhasil dikirim! Kode tiket Anda: ' . $ticketCode);
-            redirect(base_url('user/complaint_detail.php?id=' . $newId));
-            exit;
+                // Save the complaint and its initial status log atomically.
+                $conn->begin_transaction();
+                $ticketCode = generateTicketCode($conn);
+
+                $stmt = $conn->prepare("INSERT INTO complaints (user_id, category_id, ticket_code, title, description, address, latitude, longitude, photo, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("iissssddssss", $user['id'], $category_id, $ticketCode, $title, $description, $address, $latVal, $lngVal, $photoPath, $status, $now, $now);
+                if (!$stmt->execute()) {
+                    throw new RuntimeException('Gagal menyimpan data pengaduan.');
+                }
+                $newId = (int) $conn->insert_id;
+                $stmt->close();
+
+                // Insert status log
+                $logStmt = $conn->prepare("INSERT INTO complaint_status_logs (complaint_id, old_status, new_status, changed_by, note, created_at) VALUES (?, NULL, ?, ?, ?, ?)");
+                $changedBy = 'Sistem';
+                $logNote = 'Laporan diterima oleh sistem.';
+                $logStmt->bind_param("issss", $newId, $status, $changedBy, $logNote, $now);
+                if (!$logStmt->execute()) {
+                    throw new RuntimeException('Gagal menyimpan riwayat status pengaduan.');
+                }
+                $logStmt->close();
+
+                $conn->commit();
+                $submissionSucceeded = true;
+            } catch (Throwable $exception) {
+                $conn->rollback();
+                error_log('LaporKota: gagal membuat pengaduan: ' . $exception->getMessage());
+                $errors['general'] = 'Pengaduan belum berhasil disimpan. Silakan coba kembali.';
+            } finally {
+                if ($lockAcquired) {
+                    // Release the advisory lock even when an insert fails.
+                    try {
+                        $conn->query("SELECT RELEASE_LOCK('laporkota_ticket_code')");
+                    } catch (Throwable $releaseException) {
+                        error_log('LaporKota: gagal melepas lock kode tiket: ' . $releaseException->getMessage());
+                    }
+                }
+            }
+
+            if ($submissionSucceeded) {
+                flash('success', 'Pengaduan berhasil dikirim! Kode tiket Anda: ' . $ticketCode);
+                redirect(base_url('user/complaint_detail.php?id=' . $newId));
+                exit;
+            }
         }
     }
 }
@@ -575,6 +615,12 @@ $mapLng = isset($old['longitude']) && is_numeric($old['longitude']) ? (float) $o
                 <h1><?= $isEdit ? 'Edit Pengaduan' : 'Buat Pengaduan Baru' ?></h1>
                 <p><?= $isEdit ? 'Perbarui informasi pengaduan Anda di bawah ini.' : 'Sampaikan keluhan atau laporan Anda mengenai fasilitas dan layanan kota.' ?></p>
             </div>
+
+            <?php if (isset($errors['general'])): ?>
+                <div class="alert alert-danger" role="alert">
+                    <?= e($errors['general']) ?>
+                </div>
+            <?php endif; ?>
 
             <form action="" method="POST" enctype="multipart/form-data" novalidate>
                 <?= csrf_field() ?>
