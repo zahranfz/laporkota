@@ -17,7 +17,7 @@ $pageTitle = 'Daftar Pengaduan';
 // Retrieve and sanitize search & filter inputs from GET
 $q = isset($_GET['q']) ? trim($_GET['q']) : '';
 $categoryFilter = isset($_GET['category']) && $_GET['category'] !== '' ? (int)$_GET['category'] : 0;
-$validStatuses = ['Diterima', 'Diproses', 'Selesai', 'Ditolak'];
+$validStatuses = ['Diterima', 'Diproses', 'Selesai']; // Status Ditolak tidak ditampilkan di daftar publik.
 $statusFilter = isset($_GET['status']) && in_array($_GET['status'], $validStatuses, true) ? $_GET['status'] : '';
 $currentPage = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 
@@ -26,8 +26,9 @@ $categoriesQuery = "SELECT id, name, icon FROM categories ORDER BY name ASC";
 $categoriesResult = $conn->query($categoriesQuery);
 $categoriesList = $categoriesResult ? $categoriesResult->fetch_all(MYSQLI_ASSOC) : [];
 
-// Build dynamic WHERE clause with prepared statements
-$whereClauses = [];
+// Build dynamic WHERE clause with prepared statements.
+// Pengaduan berstatus Ditolak selalu dikecualikan dari daftar publik.
+$whereClauses = ["c.status <> 'Ditolak'"];
 $params = [];
 $types = '';
 

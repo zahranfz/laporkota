@@ -68,6 +68,7 @@ $complaintsQuery = $conn->query("
     FROM complaints c
     JOIN categories cat ON c.category_id = cat.id
     JOIN users u ON c.user_id = u.id
+    WHERE c.status <> 'Ditolak'
     ORDER BY c.created_at DESC
     LIMIT 6
 ");
